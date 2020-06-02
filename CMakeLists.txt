@@ -23,8 +23,8 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
 endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5Charts REQUIRED)
-find_package(boost REQUIRED)
+#find_package(Qt5Charts REQUIRED)
+find_package(Boost REQUIRED)
 
 include_directories(include)
 include_directories(${Boost_INCLUDE_DIR})
@@ -32,8 +32,6 @@ include_directories(${Boost_INCLUDE_DIR})
 set(MY_SOURCES
 	src/mainwindow.h
 	src/mainwindow.cpp
-	src/chartview.cpp
-	include/chartview.h
 )
 
 set(MY_MOCS
@@ -43,8 +41,8 @@ set(MY_MOCS
 
 add_executable(GCoder ${MY_SOURCES} ${MY_MOCS} src/main.cpp)
 
-
-target_link_libraries(GCoder Qt5::Widgets Qt5::Charts)
+target_link_libraries(GCoder Qt5::Widgets)
+#target_link_libraries(GCoder Qt5::Widgets Qt5::Charts)
 #target_link_libraries(main PRIVATE Qt5::Charts Qt5::ChartsPrivate)
 target_link_libraries(GCoder ${Boost_LIBRARIES})
 

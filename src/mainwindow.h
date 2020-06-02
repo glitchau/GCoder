@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <iostream>
 
 class Mainwindow : public QWidget {
 	Q_OBJECT
