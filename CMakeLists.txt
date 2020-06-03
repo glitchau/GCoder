@@ -32,9 +32,12 @@ include_directories(${Boost_INCLUDE_DIR})
 set(MY_SOURCES
 	src/mainwindow.h
 	src/mainwindow.cpp
+	src/gcoder_widget.h
+	src/gcoder_widget.cpp
 )
 
 set(MY_MOCS
+	src/gcoder_widget.ui
 	src/mainwindow.ui
 )
 

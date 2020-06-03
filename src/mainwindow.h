@@ -1,35 +1,20 @@
 #pragma once
 #include "ui_mainwindow.h"
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
+#include "gcoder_widget.h"
+#include <QtWidgets>
 #include <iostream>
 
-class Mainwindow : public QWidget {
+class MainWindow : public QMainWindow
+{
 	Q_OBJECT
 
 public:
-	explicit Mainwindow(QWidget* parent = nullptr);
-	~Mainwindow();
+	explicit MainWindow(QMainWindow* parent = nullptr);
+	~MainWindow();
 
 private: //functions
-	Ui::GCoder ui;
-
-	void loadSettings();
-
-	void saveSettings();
-
-	void updateGraphic();
-
-private slots:
-
-	void handleButton();
-	void on_Columns_spinBox_valueChanged();
-
-private: //variables
-	QString m_sSettingsFile;
-
-	QLabel* m_pLabel;
-	QLineEdit* m_pEdit;
+	Ui::MainWindow ui;
+	GCoder_Widget* gcoder;
+public:
 
 };

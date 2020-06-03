@@ -7,7 +7,9 @@
 int main(int argc, char** argv) //and change add_executable (remove WIN32)
 {
 	QApplication app(argc, argv);
-	Mainwindow w;
+
+
+	MainWindow w;
 	
 
 	
