@@ -26,6 +26,8 @@ private slots:
 	void handleButton();
 	void on_Columns_spinBox_valueChanged();
 	void on_printer_pushButton_pressed();
+	void on_add_pushButton_pressed();
+	void on_remove_pushButton_pressed();
 
 private: //variables
 	QString m_sSettingsFile;

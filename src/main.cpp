@@ -1,6 +1,7 @@
 //#include "rapidcsv.h"
 #include <QApplication>
 #include "mainwindow.h"
+#include "gcode.h"
 
 
 //int WinMain(int argc, char** argv)
@@ -11,8 +12,9 @@ int main(int argc, char** argv) //and change add_executable (remove WIN32)
 
 	MainWindow w;
 	
-
-	
+	GCode test;
+	std::cout << "NULL: " << test.G01() << "| |" << std::endl;
+	std::cout << "1: " << test.G01(1) << "| |" << std::endl;
 
 	w.show();
 

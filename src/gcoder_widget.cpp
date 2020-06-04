@@ -7,7 +7,8 @@
 GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 {
 	ui.setupUi(this);
-
+	ui.treeWidget->clear();
+	//ui.treeWidget->
 	//m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/demosettings.ini";
 	m_sSettingsFile = QApplication::applicationDirPath() + "/demosettings.ini";
 	std::cout << m_sSettingsFile.toStdString() << std::endl;
@@ -64,6 +65,24 @@ void GCoder_Widget::on_Columns_spinBox_valueChanged()
 void GCoder_Widget::on_printer_pushButton_pressed() 
 {
 	std::cout << "Printer Push Button Pressed" << std::endl;
+}
+
+void GCoder_Widget::on_add_pushButton_pressed()
+{
+	//QListWidgetItem* newItem = new QListWidgetItem;
+	///newItem->setText("test");
+	//ui.treewidget->insertItem(0, newItem);
+	//ui.treeWidget
+	//ui.treewidget;
+	QTreeWidgetItem* cities = new QTreeWidgetItem(ui.treeWidget);
+	cities->setText(0, tr("Cities"));
+	QTreeWidgetItem* osloItem = new QTreeWidgetItem(cities);
+	osloItem->setText(0, tr("Oslo"));
+}
+
+void GCoder_Widget::on_remove_pushButton_pressed()
+{
+	std::cout << ui.treeWidget->topLevelItemCount() << std::endl;
 }
 
 void GCoder_Widget::updateGraphic() {

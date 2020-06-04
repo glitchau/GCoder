@@ -25,6 +25,7 @@ endif()
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 #find_package(Qt5Charts REQUIRED)
 find_package(Boost REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
 
 include_directories(include)
 include_directories(${Boost_INCLUDE_DIR})
@@ -34,6 +35,8 @@ set(MY_SOURCES
 	src/mainwindow.cpp
 	src/gcoder_widget.h
 	src/gcoder_widget.cpp
+	src/gcode.cpp
+	include/gcode.h
 )
 
 set(MY_MOCS
@@ -44,7 +47,7 @@ set(MY_MOCS
 
 add_executable(GCoder ${MY_SOURCES} ${MY_MOCS} src/main.cpp)
 
-target_link_libraries(GCoder Qt5::Widgets)
+target_link_libraries(GCoder Qt5::Widgets yaml-cpp)
 #target_link_libraries(GCoder Qt5::Widgets Qt5::Charts)
 #target_link_libraries(main PRIVATE Qt5::Charts Qt5::ChartsPrivate)
 target_link_libraries(GCoder ${Boost_LIBRARIES})
