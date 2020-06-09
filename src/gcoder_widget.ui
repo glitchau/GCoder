@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>500</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1000</width>
-    <height>500</height>
+    <width>1280</width>
+    <height>720</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1000</width>
-    <height>500</height>
+    <width>1280</width>
+    <height>720</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>570</y>
      <width>101</width>
      <height>28</height>
     </rect>
@@ -45,10 +45,13 @@
    </property>
   </widget>
   <widget class="QPushButton" name="printer_pushButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>420</y>
+     <y>530</y>
      <width>101</width>
      <height>28</height>
     </rect>
@@ -147,10 +150,10 @@
   <widget class="QGraphicsView" name="graphicsView">
    <property name="geometry">
     <rect>
-     <x>590</x>
-     <y>40</y>
-     <width>400</width>
-     <height>400</height>
+     <x>610</x>
+     <y>30</y>
+     <width>651</width>
+     <height>651</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -173,7 +176,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>360</y>
+     <y>430</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -186,7 +189,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>390</y>
+     <y>460</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -199,7 +202,7 @@
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>200</y>
+     <y>300</y>
      <width>21</width>
      <height>23</height>
     </rect>
@@ -212,7 +215,7 @@
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>230</y>
+     <y>330</y>
      <width>21</width>
      <height>23</height>
     </rect>
@@ -225,9 +228,9 @@
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>40</y>
-     <width>256</width>
-     <height>401</height>
+     <y>30</y>
+     <width>281</width>
+     <height>651</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -252,7 +255,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>420</y>
+     <y>490</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -264,8 +267,8 @@
   <widget class="QPushButton" name="generate_pushButton">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>310</y>
+     <x>80</x>
+     <y>320</y>
      <width>101</width>
      <height>28</height>
     </rect>

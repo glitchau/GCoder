@@ -50,6 +50,7 @@ private slots:
 	void updateGraphic();
 	void generate();
 	void loadSettings();
+	void UpdateTreeWidget(QTreeWidgetItem*, int);
 
 private: //variables
 	QString m_sSettingsFile;

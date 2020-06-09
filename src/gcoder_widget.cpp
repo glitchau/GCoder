@@ -13,6 +13,7 @@ GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 	ui.treeWidget->setColumnCount(2);
 	ui.treeWidget->setColumnWidth(2, 10);
 	ui.treeWidget->clear();
+	ui.treeWidget->setAlternatingRowColors(true);
 	//ui.treeWidget->
 	//m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/demosettings.ini";
 	m_sSettingsFile = QApplication::applicationDirPath() + "/settings.ini";
@@ -44,6 +45,7 @@ GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 	//connect(ui.distPresses_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
 	connect(ui.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(updateGraphic()));
 	connect(ui.generate_pushButton, SIGNAL(pressed()), this, SLOT(generate()));
+	connect(ui.treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(UpdateTreeWidget(QTreeWidgetItem*, int)));
 
 	connect(qfilewatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(loadSettings()));
 }
@@ -146,9 +148,9 @@ void GCoder_Widget::updateGraphic() {
 	}
 	QBrush brushy2(Qt::SolidPattern);
 	brushy.setColor(QColor(Qt::blue));
-	int prongEllipseSize = 2;
+	int prongEllipseSize = 3;
 	int startEllipseSize = 4;
-	scene->addEllipse(mm2px(ui.startX_spinBox->value() - startEllipseSize / 2), mm2px(ui.startY_spinBox->value() - startEllipseSize / 2), startEllipseSize, startEllipseSize, QPen(Qt::cyan), brushy2);
+	scene->addEllipse(mm2px(ui.startX_spinBox->value())- startEllipseSize/2, mm2px(ui.startY_spinBox->value())- startEllipseSize/2, startEllipseSize, startEllipseSize, QPen(Qt::cyan), brushy2);
 	for (int i = 0; i < linePoints.size()-1; i++)
 	{
 		QPen pen(Qt::blue);
@@ -159,8 +161,8 @@ void GCoder_Widget::updateGraphic() {
 			pen.setColor(Qt::magenta);
 		scene->addLine(mm2px(linePoints[i].x()), mm2px(linePoints[i].y()), mm2px(linePoints[i+1].x()), mm2px(linePoints[i+1].y()), pen);
 		if (i != 0) {
-			scene->addEllipse(mm2px(linePoints[i].x() - distProngs - prongEllipseSize / 2), mm2px(linePoints[i].y() - prongEllipseSize / 2), prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
-			scene->addEllipse(mm2px(linePoints[i].x() + distProngs - prongEllipseSize / 2), mm2px(linePoints[i].y() - prongEllipseSize / 2), prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+			scene->addEllipse(mm2px(linePoints[i].x() - distProngs) - prongEllipseSize / 2, mm2px(linePoints[i].y()) - prongEllipseSize / 2, prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+			scene->addEllipse(mm2px(linePoints[i].x() + distProngs) - prongEllipseSize / 2, mm2px(linePoints[i].y()) - prongEllipseSize / 2, prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
 		}
 	}
 
@@ -455,4 +457,21 @@ void GCoder_Widget::generate()
 		std::cout << "Action Cancelled" << std::endl;
 	}
 	updateGraphic();
+}
+
+void GCoder_Widget::UpdateTreeWidget(QTreeWidgetItem* item, int column)
+{
+	std::stringstream ss;
+	for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
+	{
+		ss.str(std::string());
+		for (int j = 0; j < ui.treeWidget->topLevelItem(i)->childCount(); ++j)
+		{
+			if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
+				ss << ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString() << ":" << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString() << "   ";
+			}
+			
+		}
+		ui.treeWidget->topLevelItem(i)->setText(1, ss.str().c_str());
+	}	
 }
