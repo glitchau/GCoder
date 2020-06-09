@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GCODE_H
+#define GCODE_H
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -22,6 +24,8 @@ private: //functions
 public:
 	//std::string GCode::G01(void);
 	std::string GCode::G01(int x = NULL);
+	void GCode::getList(std::vector<std::string>& v);
+	void GCode::getParameters(std::vector<std::string>& v, std::string variable);
 
 
 
@@ -35,3 +39,5 @@ public:
 	};
 	*/
 };
+
+#endif

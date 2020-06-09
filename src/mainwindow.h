@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include "ui_mainwindow.h"
 #include "gcoder_widget.h"
 #include <QtWidgets>
@@ -18,3 +20,5 @@ private: //functions
 public:
 
 };
+
+#endif

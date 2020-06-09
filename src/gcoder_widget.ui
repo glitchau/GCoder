@@ -34,9 +34,9 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>420</y>
-     <width>93</width>
+     <x>10</x>
+     <y>460</y>
+     <width>101</width>
      <height>28</height>
     </rect>
    </property>
@@ -47,9 +47,9 @@
   <widget class="QPushButton" name="printer_pushButton">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>380</y>
-     <width>93</width>
+     <x>10</x>
+     <y>420</y>
+     <width>101</width>
      <height>28</height>
     </rect>
    </property>
@@ -57,10 +57,10 @@
     <string>Printer Settings</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="Columns_spinBox">
+  <widget class="QSpinBox" name="column_spinBox">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>210</x>
      <y>40</y>
      <width>42</width>
      <height>22</height>
@@ -70,7 +70,7 @@
     <number>1</number>
    </property>
    <property name="maximum">
-    <number>2</number>
+    <number>5</number>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -89,7 +89,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>10</x>
      <y>70</y>
      <width>101</width>
      <height>16</height>
@@ -99,10 +99,10 @@
     <string>Number Of Rows</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox_2">
+  <widget class="QSpinBox" name="row_spinBox">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>210</x>
      <y>70</y>
      <width>42</width>
      <height>22</height>
@@ -121,27 +121,27 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>160</y>
-     <width>55</width>
+     <x>10</x>
+     <y>130</y>
+     <width>141</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Start/End Position (X,Y)</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>130</y>
-     <width>55</width>
+     <x>10</x>
+     <y>100</y>
+     <width>161</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Distance Between Batteries</string>
    </property>
   </widget>
   <widget class="QGraphicsView" name="graphicsView">
@@ -159,12 +159,21 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
   </widget>
   <widget class="QPushButton" name="add_pushButton">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>260</y>
+     <x>210</x>
+     <y>360</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -176,8 +185,8 @@
   <widget class="QPushButton" name="remove_pushButton">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>290</y>
+     <x>210</x>
+     <y>390</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -189,7 +198,7 @@
   <widget class="QPushButton" name="up_pushButton">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>270</x>
      <y>200</y>
      <width>21</width>
      <height>23</height>
@@ -202,7 +211,7 @@
   <widget class="QPushButton" name="down_pushButton">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>270</x>
      <y>230</y>
      <width>21</width>
      <height>23</height>
@@ -224,12 +233,222 @@
    <property name="contextMenuPolicy">
     <enum>Qt::DefaultContextMenu</enum>
    </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
    <property name="selectionBehavior">
     <enum>QAbstractItemView::SelectRows</enum>
    </property>
    <attribute name="headerVisible">
     <bool>false</bool>
    </attribute>
+   <column>
+    <property name="text">
+     <string notr="true">1</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QPushButton" name="clear_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>420</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Clear All</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="generate_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>310</y>
+     <width>101</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Generate</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>190</y>
+     <width>111</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Travel Height (Z)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>220</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Press Height</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>250</y>
+     <width>121</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Presses Per Battery</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>161</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Distance Between Presses</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="batteryDist_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>100</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>18</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="startX_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>130</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="startY_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>130</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="travelZ_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>190</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="pressZ_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>220</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>200</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="presses_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>250</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="distPresses_doubleSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>280</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>1</number>
+   </property>
+   <property name="minimum">
+    <double>0.100000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.100000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>160</y>
+     <width>141</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>First Batt Position (X,Y)</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="battX_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>160</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="battY_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>160</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
   </widget>
  </widget>
  <resources/>

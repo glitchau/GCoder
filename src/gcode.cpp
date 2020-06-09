@@ -73,7 +73,19 @@ std::string GCode::G01(void) {
 }
 */
 
+void GCode::getList(std::vector<std::string> &v)
+{
+	for (auto it = gcodeVariables1.begin(); it != gcodeVariables1.end(); ++it) {
+		//std::cout << "getList" << it->first << std::endl;
+		v.push_back(it->first);
+	}
+	
+}
 
+void GCode::getParameters(std::vector<std::string>& v, std::string variable)
+{
+	v = gcodeVariables1.find(variable)->second;
+}
 
 std::string GCode::G01(int x) {
 	std::stringstream ss;

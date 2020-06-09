@@ -7,15 +7,43 @@
 GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 {
 	ui.setupUi(this);
+	scene = new QGraphicsScene();
+	ui.graphicsView->setScene(scene);
+	ui.treeWidget->setColumnCount(2);
+	ui.treeWidget->setColumnWidth(2, 10);
 	ui.treeWidget->clear();
 	//ui.treeWidget->
 	//m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/demosettings.ini";
 	m_sSettingsFile = QApplication::applicationDirPath() + "/demosettings.ini";
 	std::cout << m_sSettingsFile.toStdString() << std::endl;
 	loadSettings();
+	QRect currentGeometry = ui.graphicsView->geometry();
+	//printerY = 150;
+	double pixelPerMM = (double)currentGeometry.width() / (double)printerX;
+	std::cout << (double)currentGeometry.width() << " " << printerX << std::endl;
+	std::cout << "pix: " << pixelPerMM << std::endl;
+	int newHeight = pixelPerMM * printerY;
+	std::cout << "new height: " << newHeight << std::endl;
+	currentGeometry.setHeight(newHeight);
+	ui.graphicsView->setGeometry(currentGeometry);
+
+	
+	mm2px(printerX);
+	px2mm(400);
+	//scene->addEllipse(0,0,1,1, QPen(Qt::black));
+	updateGraphic();
+
+	connect(ui.column_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	connect(ui.row_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	connect(ui.batteryDist_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	connect(ui.presses_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	connect(ui.battX_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	connect(ui.battY_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	//connect(ui.distPresses_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
+	connect(ui.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(updateGraphic()));
 
 
-
+	connect(ui.generate_pushButton, SIGNAL(pressed()), this, SLOT(generate()));
 	//m_pLabel = new QLabel("", this);
 	//m_pLabel->setGeometry(0, 80, 200, 40);
 	//m_pEdit = new QLineEdit("", this);
@@ -28,40 +56,70 @@ GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 	*/
 	//connect(ui.Columns_spinBox, SIGNAL(changeEvent), this, SLOT(handleButton()));
 
-	QVector <QPointF> points;
-	for (int i = 0; i < 80; i++)
-		points.append(QPointF(i * 5, i * 5));
+	//QVector <QPointF> points;
+	//for (int i = 0; i < 15; i++)
+	//	points.append(QPointF(i * 20, i * 20));
 
-	QGraphicsScene* scene = new QGraphicsScene();
-	ui.graphicsView->setScene(scene);
+	
+
+	
 
 	//size of bed 120x120
 	//120 = 400
 	// 400/120 = number of pixels per mm
 	// 18 * 400 / 120
 
-	for (int i = 0; i < points.size(); i++)
-		scene->addEllipse(points[i].x(), points[i].y(), (int)((18 * 400) / 120), (int)((18 * 400) / 120), QPen(Qt::green));
-
-	int batteryDiameter = 18;
-
-	std::cout << "Battery: " << ((18 * 400) / 120) << std::endl;
-
-	scene->addEllipse(0, 0, 1, 1);
+	
+	
 
 
+//	on_add_pushButton_pressed();
+	/*
+	QTreeWidgetItem* item = new QTreeWidgetItem;
+	// Snip
+	
+	
+	QTreeWidgetItem* cities = new QTreeWidgetItem(ui.treeWidget);
+	cities->setText(0, tr("Cities"));
+	QTreeWidgetItem* osloItem = new QTreeWidgetItem(cities);
+	osloItem->setText(0, tr("Oslo"));
+	
+	cmb = new  QComboBox(ui.treeWidget);
+
+	cmb->addItem("Item1");// , 'value1');
+	cmb->addItem("Item2");// , 'value2');
+	cmb->addItem("Item3");// , 'value3');
+	
+	item = new QTreeWidgetItem(ui.treeWidget);
+		int column = 0;
+		ui.treeWidget->setItemWidget(item, column, cmb);
+		
+
+		QTreeWidgetItem* x = new QTreeWidgetItem(item);
+		x->setText(0, tr("X"));
+		x->setText(1, "10.0mm");
+		QTreeWidgetItem* y = new QTreeWidgetItem(item);
+		y->setText(0, tr("Y"));
+		y->setText(1, "10.0mm");
+		QTreeWidgetItem* z = new QTreeWidgetItem(item);
+		z->setText(0, tr("Z"));
+		z->setText(1, "10.0mm");
+		*/
 }
 
 GCoder_Widget::~GCoder_Widget()
 {
+	saveSettings();
 	//std::cout << "Killer Process" << std::endl;
 }
 
-void GCoder_Widget::on_Columns_spinBox_valueChanged()
+/*
+void GCoder_Widget::on_valueChanged()
 {
-	std::cout << "Columns spin" << std::endl;
+	std::cout << "row spin" << std::endl;
+	updateGraphic();
 }
-
+*/
 void GCoder_Widget::on_printer_pushButton_pressed() 
 {
 	std::cout << "Printer Push Button Pressed" << std::endl;
@@ -69,57 +127,370 @@ void GCoder_Widget::on_printer_pushButton_pressed()
 
 void GCoder_Widget::on_add_pushButton_pressed()
 {
-	//QListWidgetItem* newItem = new QListWidgetItem;
-	///newItem->setText("test");
-	//ui.treewidget->insertItem(0, newItem);
-	//ui.treeWidget
-	//ui.treewidget;
-	QTreeWidgetItem* cities = new QTreeWidgetItem(ui.treeWidget);
-	cities->setText(0, tr("Cities"));
-	QTreeWidgetItem* osloItem = new QTreeWidgetItem(cities);
-	osloItem->setText(0, tr("Oslo"));
+	addGCommand();
 }
 
 void GCoder_Widget::on_remove_pushButton_pressed()
 {
-	std::cout << ui.treeWidget->topLevelItemCount() << std::endl;
+	if (ui.treeWidget->selectedItems().size() > 0) {
+		delete ui.treeWidget->selectedItems().begin().i->t();
+	}
 }
 
 void GCoder_Widget::updateGraphic() {
 	//get updated values, clear image and redraw
+	//ui.graphicsView->scene()->clear();
+	int batteryDist = ui.batteryDist_spinBox->text().toInt();
+	if (ui.battX_spinBox->text().toInt() < 0.5 * batteryDist) {
+		ui.battX_spinBox->setValue(0.5 * batteryDist);
+	}
+	if (ui.battY_spinBox->text().toInt() < 0.5 * batteryDist) {
+		ui.battY_spinBox->setValue(0.5 * batteryDist);
+	}
+
+	scene->clear();
+	std::cout << "clear" << std::endl;
+	scene->addEllipse(0, 0, 1, 1, QPen(Qt::black));//Add origin point?
+	QVector <QPointF> points;
+	int graphicsWidth = ui.graphicsView->geometry().width();
+	int graphicsHeight = ui.graphicsView->geometry().height();
+	int x = (int)((ui.battX_spinBox->text().toInt()) - batteryDist / 2);
+	int y = (int)((ui.battY_spinBox->text().toInt()) - batteryDist / 2);
+
+	for (int i = 0; i < ui.row_spinBox->text().toInt(); ++i)
+	{
+		x = (int)(ui.battX_spinBox->text().toInt() - batteryDist / 2);
+		for (int j = 0; j < ui.column_spinBox->text().toInt(); ++j)
+		{
+			points.append(QPointF(x, y));
+			x = x + batteryDist;
+		}
+		y = y + batteryDist;
+
+	}
+	QBrush brushy(Qt::SolidPattern);
+	brushy.setColor(QColor(218, 111, 5, 180));
+	for (int i = 0; i < points.size(); i++) 
+	{
+		scene->addEllipse(mm2px(points[i].x()), mm2px(points[i].y()),mm2px(batteryDist),mm2px(batteryDist), QPen(Qt::red), brushy);
+	}
+
+
+	//add lines
+	QVector<QPointF> linePoints;
+	for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
+	{
+		QComboBox* box = qobject_cast<QComboBox*>(ui.treeWidget->itemWidget(ui.treeWidget->topLevelItem(i), 0));//get combobox
+		std::string currentG = box->currentText().toStdString();//get G#
+		//std::cout << "curG: " << currentG << std::endl;
+		if (!currentG.compare("G1"))
+		{
+			//double linex, liney;
+			QPointF point;
+			bool Xtrue = false, YTrue = false;
+			for (int j = 0; j < ui.treeWidget->topLevelItem(i)->childCount(); ++j)
+			{
+				if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
+					std::string variable = ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString();
+					if (!variable.compare("X"))
+					{
+
+						//linex = ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble();
+						point.setX(ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble());
+						Xtrue = true;
+						//std::cout << "x: " << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble() << std::endl;
+					}
+					if (!variable.compare("Y"))
+					{
+						point.setY(ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble());
+						YTrue = true;
+						//std::cout << "y: " << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble() << std::endl;
+					}
+				}
+			}
+			if (Xtrue && YTrue)
+			{
+				linePoints.append(point);
+			}
+		}
+	}
+	QBrush brushy2(Qt::SolidPattern);
+	brushy.setColor(QColor(Qt::blue));
+	int prongEllipseSize = 3;
+	for (int i = 0; i < linePoints.size()-1; i++)
+	{
+		//scene->addEllipse(mm2px(points[i].x()), mm2px(points[i].y()), mm2px(batteryDist), mm2px(batteryDist), QPen(Qt::red), brushy);
+		scene->addLine(mm2px(linePoints[i].x()), mm2px(linePoints[i].y()), mm2px(linePoints[i+1].x()), mm2px(linePoints[i+1].y()), QPen(Qt::blue));
+		if (i != 0) {
+			scene->addEllipse(mm2px(linePoints[i].x() - distProngs - prongEllipseSize / 2), mm2px(linePoints[i].y() - prongEllipseSize / 2), prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+			scene->addEllipse(mm2px(linePoints[i].x() + distProngs - prongEllipseSize / 2), mm2px(linePoints[i].y() - prongEllipseSize / 2), prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+		}
+	}
+
+
 }
 
 void GCoder_Widget::loadSettings()
 {
 	std::cout << "Load Settings" << std::endl;
-	QSettings settings(m_sSettingsFile, QSettings::IniFormat);
-	std::cout << "size: " << settings.allKeys().size() << std::endl;
-	std::cout << "settings: " << (settings.allKeys().begin() + 1)->toStdString() << std::endl;
-	std::cout << "Load Settings2" << std::endl;
-	QString sText = settings.value("Settings", "").toString();
-	//QSettings settings2 = settings.value("Settings", "");
-	QString sText2 = settings.value("Settings/DetailedLog", "").toString();
-	std::cout << "Load Settings3: " << sText.toStdString() << std::endl;
-	std::cout << "Load Settings4: " << sText2.toStdString() << std::endl;
-	/**f (m_pLabel)
+	if (!QFile(m_sSettingsFile).exists())
 	{
-		m_pLabel->setText(sText);
+		saveSettings();// save default
 	}
-	*/
+	else {
+		QSettings settings(m_sSettingsFile, QSettings::IniFormat);
+		settings.beginGroup("Parameters");
+		ui.column_spinBox->setValue(settings.value("Columns").toInt());
+		ui.row_spinBox->setValue(settings.value("Rows").toInt());
+		ui.batteryDist_spinBox->setValue(settings.value("Distance").toInt());
+		ui.startX_spinBox->setValue(settings.value("StartX").toInt());
+		ui.startY_spinBox->setValue(settings.value("StartY").toInt());
+		ui.battX_spinBox->setValue(settings.value("BatteryX").toInt());
+		ui.battY_spinBox->setValue(settings.value("BatteryY").toInt());
+		ui.travelZ_spinBox->setValue(settings.value("TravelZ").toInt());
+		ui.pressZ_spinBox->setValue(settings.value("PressZ").toInt());
+		ui.presses_spinBox->setValue(settings.value("NumberOfPresses").toInt());
+		printerX = settings.value("PrinterX", "100").toInt();
+		printerY = settings.value("PrinterY", "100").toInt();
+		distProngs = settings.value("DistanceProngs", "5").toInt();
+		ui.distPresses_doubleSpinBox->setValue(settings.value("DistancePresses", "5.0").toDouble());
+		settings.endGroup();
+		
+	}
+
 }
 
 void GCoder_Widget::saveSettings()
 {
 	QSettings settings(m_sSettingsFile, QSettings::IniFormat);
-	//QString sText = (m_pEdit) ? m_pEdit->text() : "";
-	//settings.setValue("text", sText);
-	//if (m_pLabel)
-	//{
-	//	m_pLabel->setText(sText);
-	//}
+	settings.beginGroup("MainWindow");
+	settings.setValue("size", size());
+	settings.setValue("pos", pos());
+	settings.endGroup();
+	settings.beginGroup("Parameters");
+	settings.setValue("Columns", ui.column_spinBox->text());
+	settings.setValue("Rows", ui.row_spinBox->text());
+	settings.setValue("Distance", ui.batteryDist_spinBox->text());
+	settings.setValue("StartX", ui.startX_spinBox->text());
+	settings.setValue("StartY", ui.startY_spinBox->text());
+	settings.setValue("BatteryX", ui.battX_spinBox->text());
+	settings.setValue("BatteryY", ui.battY_spinBox->text());
+	settings.setValue("TravelZ", ui.travelZ_spinBox->text());
+	settings.setValue("PressZ", ui.pressZ_spinBox->text());
+	settings.setValue("NumberOfPresses", ui.presses_spinBox->text());
+	settings.setValue("PrinterX", printerX);
+	settings.setValue("PrinterY", printerY);
+	settings.setValue("DistanceProngs", distProngs);
+	settings.setValue("DistancePresses", ui.distPresses_doubleSpinBox->text());
+	//distPresses_doubleSpinBox
+	settings.endGroup();
 }
 
 void GCoder_Widget::handleButton()
 {
 	saveSettings();
+}
+
+void GCoder_Widget::addGCommand()
+{
+	
+	std::map<std::string, std::string> x;//
+	x.insert(std::pair<std::string, std::string>("X", "10"));
+	addGCommand("G1", x);
+	updateGraphic();
+}
+ 
+void GCoder_Widget::addGCommand(std::string input, std::map<std::string, std::string> x)
+{
+	QTreeWidgetItem* item = new QTreeWidgetItem;
+
+	QComboBox* cmb = new  QComboBox(ui.treeWidget);
+	connect(cmb, SIGNAL(currentIndexChanged(QString)), SLOT(yourfunction(QString)));
+	std::vector<std::string> glist;
+	gcode.getList(glist);
+	for (auto it = glist.begin(); it != glist.end(); ++it)
+	{
+		cmb->addItem((*it).c_str());// , 'value1');
+	}
+	cmb->setCurrentIndex(cmb->findText(input.c_str()));
+	item = new QTreeWidgetItem(ui.treeWidget);
+	int column = 0;
+	ui.treeWidget->setItemWidget(item, column, cmb);
+	updateGParameters(input, item, x);
+}
+
+void GCoder_Widget::yourfunction(QString v)
+{
+	if (ui.treeWidget->selectedItems().size() == 1) {
+		QTreeWidgetItem* x = ui.treeWidget->selectedItems().begin().i->t();
+		updateGParameters(v.toStdString(), x);
+	}
+}
+
+void GCoder_Widget::updateGParameters(std::string input, QTreeWidgetItem* item, std::map<std::string, std::string> x)
+{
+	std::vector<std::string> p;
+	gcode.getParameters(p, input);
+	while (item->childCount() > 0)
+	{
+		delete item->child(0);
+	}
+
+	for (auto it = p.begin(); it != p.end(); ++it)
+	{
+		QTreeWidgetItem* r = new QTreeWidgetItem(item);
+		r->setFlags(item->flags() | Qt::ItemIsEditable);
+		r->setText(0, (*it).c_str());
+		if (x.count((*it).c_str()))
+		{
+			r->setText(1, x.find((*it).c_str())->second.c_str());
+		}
+		else
+		{
+			r->setText(1, "");
+		}
+	}
+}
+
+void GCoder_Widget::on_pushButton_pressed() {
+
+	std::cout << "Generating GCode" << std::endl;
+
+	//std::cout << ui.treeWidget->topLevelItemCount() << std::endl;
+	std::stringstream ss;
+	for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
+	{
+		QComboBox* box = qobject_cast<QComboBox*>(ui.treeWidget->itemWidget(ui.treeWidget->topLevelItem(i), 0));//get combobox
+		ss << box->currentText().toStdString() << " ";//get G#
+		for (int j = 0; j < ui.treeWidget->topLevelItem(i)->childCount(); ++j)
+		{
+			if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
+				ss << ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString() << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString() << " ";
+			}
+		}
+		ss << std::endl;
+	}
+
+	std::cout << "This:\n" << ss.str() << std::endl;
+}
+
+void GCoder_Widget::on_clear_pushButton_pressed()
+{
+	QMessageBox msgBox;
+	msgBox.setText("This will delete all generated GCode");
+	msgBox.setInformativeText("Are you sure you want to clear all generated GCode?");
+	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+	msgBox.setDefaultButton(QMessageBox::Cancel);
+	int ret = msgBox.exec();
+
+	if (ret == QMessageBox::Yes) 
+	{
+		ui.treeWidget->clear();
+	}
+}
+
+double GCoder_Widget::px2mm(int px)
+{
+	double mmPerPX = (double)printerX / (double)ui.graphicsView->geometry().width();
+	//std::cout << "px * mmPerPX:" << px * mmPerPX << std::endl;
+	return (double)(px * mmPerPX);
+}
+
+int GCoder_Widget::mm2px(double mm)
+{
+	double pixelPerMM = (double)ui.graphicsView->geometry().width() / (double)printerX;
+	//std::cout << "mm * pixelPerMM:" << mm * pixelPerMM << std::endl;
+	return (int)(mm * pixelPerMM);
+}
+
+void GCoder_Widget::generate()
+{
+	QMessageBox msgBox;
+	//msgBox.setText("This will delete all generated GCode");
+	msgBox.setInformativeText("Do you want to delete all previously created GCode?");
+	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+	msgBox.setDefaultButton(QMessageBox::Cancel);
+	int ret = msgBox.exec();
+
+	if (ret == QMessageBox::Yes)
+	{
+		ui.treeWidget->clear();
+	}
+	if (ret == QMessageBox::No || ret == QMessageBox::Yes)
+	{
+		///#####################//
+	//move up to travel height,
+	//move to start position
+	//move to first battery, press one
+	//press
+	// up to travel height
+	//move to press 2.
+
+	///#################//
+	//Determine where all presses required and place within a vector
+	//iterate through all presses -> travel height, move, press, travel height, etc.
+
+		std::map<std::string, std::string> input;
+		input.insert(std::pair<std::string, std::string>("Z", ui.travelZ_spinBox->text().toStdString()));
+		addGCommand("G1", input);
+		input.clear();
+		input.insert(std::pair<std::string, std::string>("X", ui.startX_spinBox->text().toStdString()));
+		input.insert(std::pair<std::string, std::string>("Y", ui.startY_spinBox->text().toStdString()));
+		addGCommand("G1", input);
+
+		int batteryDist = ui.batteryDist_spinBox->text().toInt();
+
+		QVector <QPointF> points;
+		int x = (int)((ui.battX_spinBox->text().toInt()));
+		int y = (int)((ui.battY_spinBox->text().toInt()));
+		for (int i = 0; i < ui.column_spinBox->text().toInt(); ++i)
+		{
+			y = (int)(ui.battY_spinBox->text().toInt());
+			for (int j = 0; j < ui.row_spinBox->text().toInt(); ++j)
+			{
+				std::cout << "Centre of battery: [" << x << ", " << y << "]" << std::endl;
+				double currenty = 0;
+				if (ui.presses_spinBox->value() % 2 == 0) {
+					currenty = y - (ui.distPresses_doubleSpinBox->value() * 0.5 * ui.presses_spinBox->value()) + 0.5 * ui.distPresses_doubleSpinBox->value();
+				}
+				else
+				{
+					currenty = y - ui.distPresses_doubleSpinBox->value() * (int)(0.5 * ui.presses_spinBox->value());
+
+				}
+				//std::cout << currenty << std::endl;
+				for (int p = 0; p < ui.presses_spinBox->text().toInt(); ++p)
+				{
+					points.append(QPointF(x, currenty));
+					currenty = currenty + ui.distPresses_doubleSpinBox->value();
+				}
+				y = y + batteryDist;
+			}
+			x = x + batteryDist;
+		}
+
+		for (int i = 0; i < points.size(); i++)//press points
+		{
+			std::cout << "x: " << points[i].x() << " y: " << points[i].y() << std::endl;
+			input.clear();
+			input.insert(std::pair<std::string, std::string>("X", QString::number(points[i].x()).toStdString()));
+			input.insert(std::pair<std::string, std::string>("Y", QString::number(points[i].y()).toStdString()));
+			addGCommand("G1", input);
+			input.clear();
+			input.insert(std::pair<std::string, std::string>("Z", ui.pressZ_spinBox->text().toStdString()));
+			addGCommand("G1", input);
+			input.clear();
+			input.insert(std::pair<std::string, std::string>("Z", ui.travelZ_spinBox->text().toStdString()));
+			addGCommand("G1", input);
+		}
+		input.clear();
+		input.insert(std::pair<std::string, std::string>("X", ui.startX_spinBox->text().toStdString()));
+		input.insert(std::pair<std::string, std::string>("Y", ui.startY_spinBox->text().toStdString()));
+		addGCommand("G1", input);
+	}
+	if (ret == QMessageBox::Cancel)
+	{
+		std::cout << "Action Cancelled" << std::endl;
+	}
+	updateGraphic();
 }

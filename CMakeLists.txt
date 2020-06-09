@@ -37,6 +37,7 @@ set(MY_SOURCES
 	src/gcoder_widget.cpp
 	src/gcode.cpp
 	include/gcode.h
+	include/comboboxitem.h
 )
 
 set(MY_MOCS
@@ -45,7 +46,7 @@ set(MY_MOCS
 )
 
 
-add_executable(GCoder ${MY_SOURCES} ${MY_MOCS} src/main.cpp)
+add_executable(GCoder ${MY_SOURCES} ${MY_MOCS} src/main.cpp )
 
 target_link_libraries(GCoder Qt5::Widgets yaml-cpp)
 #target_link_libraries(GCoder Qt5::Widgets Qt5::Charts)
