@@ -7,6 +7,7 @@
 GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 {
 	ui.setupUi(this);
+	
 	scene = new QGraphicsScene();
 	ui.graphicsView->setScene(scene);
 	ui.treeWidget->setColumnCount(2);
@@ -14,22 +15,23 @@ GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 	ui.treeWidget->clear();
 	//ui.treeWidget->
 	//m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/demosettings.ini";
-	m_sSettingsFile = QApplication::applicationDirPath() + "/demosettings.ini";
+	m_sSettingsFile = QApplication::applicationDirPath() + "/settings.ini";
 	std::cout << m_sSettingsFile.toStdString() << std::endl;
 	loadSettings();
+	qfilewatcher = new QFileSystemWatcher();
+	qfilewatcher->addPath(m_sSettingsFile);
+	//qfilewatcher->
 	QRect currentGeometry = ui.graphicsView->geometry();
 	//printerY = 150;
-	double pixelPerMM = (double)currentGeometry.width() / (double)printerX;
-	std::cout << (double)currentGeometry.width() << " " << printerX << std::endl;
-	std::cout << "pix: " << pixelPerMM << std::endl;
-	int newHeight = pixelPerMM * printerY;
+	//double pixelPerMM = (double)currentGeometry.width() / (double)printerX;
+	//std::cout << (double)currentGeometry.width() << " " << printerX << std::endl;
+	//std::cout << "pix: " << pixelPerMM << std::endl;
+	int newHeight = mm2px(printerY);
 	std::cout << "new height: " << newHeight << std::endl;
 	currentGeometry.setHeight(newHeight);
 	ui.graphicsView->setGeometry(currentGeometry);
 
-	
-	mm2px(printerX);
-	px2mm(400);
+
 	//scene->addEllipse(0,0,1,1, QPen(Qt::black));
 	updateGraphic();
 
@@ -41,85 +43,15 @@ GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 	connect(ui.battY_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
 	//connect(ui.distPresses_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
 	connect(ui.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(updateGraphic()));
-
-
 	connect(ui.generate_pushButton, SIGNAL(pressed()), this, SLOT(generate()));
-	//m_pLabel = new QLabel("", this);
-	//m_pLabel->setGeometry(0, 80, 200, 40);
-	//m_pEdit = new QLineEdit("", this);
-	//m_pEdit->setGeometry(0, 140, 200, 40);
-	/*
-	if (ui.pushButton)
-	{
-		connect(ui.pushButton, SIGNAL(released()), this, SLOT(handleButton()));
-	}
-	*/
-	//connect(ui.Columns_spinBox, SIGNAL(changeEvent), this, SLOT(handleButton()));
 
-	//QVector <QPointF> points;
-	//for (int i = 0; i < 15; i++)
-	//	points.append(QPointF(i * 20, i * 20));
-
-	
-
-	
-
-	//size of bed 120x120
-	//120 = 400
-	// 400/120 = number of pixels per mm
-	// 18 * 400 / 120
-
-	
-	
-
-
-//	on_add_pushButton_pressed();
-	/*
-	QTreeWidgetItem* item = new QTreeWidgetItem;
-	// Snip
-	
-	
-	QTreeWidgetItem* cities = new QTreeWidgetItem(ui.treeWidget);
-	cities->setText(0, tr("Cities"));
-	QTreeWidgetItem* osloItem = new QTreeWidgetItem(cities);
-	osloItem->setText(0, tr("Oslo"));
-	
-	cmb = new  QComboBox(ui.treeWidget);
-
-	cmb->addItem("Item1");// , 'value1');
-	cmb->addItem("Item2");// , 'value2');
-	cmb->addItem("Item3");// , 'value3');
-	
-	item = new QTreeWidgetItem(ui.treeWidget);
-		int column = 0;
-		ui.treeWidget->setItemWidget(item, column, cmb);
-		
-
-		QTreeWidgetItem* x = new QTreeWidgetItem(item);
-		x->setText(0, tr("X"));
-		x->setText(1, "10.0mm");
-		QTreeWidgetItem* y = new QTreeWidgetItem(item);
-		y->setText(0, tr("Y"));
-		y->setText(1, "10.0mm");
-		QTreeWidgetItem* z = new QTreeWidgetItem(item);
-		z->setText(0, tr("Z"));
-		z->setText(1, "10.0mm");
-		*/
+	connect(qfilewatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(loadSettings()));
 }
 
 GCoder_Widget::~GCoder_Widget()
 {
 	saveSettings();
-	//std::cout << "Killer Process" << std::endl;
 }
-
-/*
-void GCoder_Widget::on_valueChanged()
-{
-	std::cout << "row spin" << std::endl;
-	updateGraphic();
-}
-*/
 void GCoder_Widget::on_printer_pushButton_pressed() 
 {
 	std::cout << "Printer Push Button Pressed" << std::endl;
@@ -138,8 +70,6 @@ void GCoder_Widget::on_remove_pushButton_pressed()
 }
 
 void GCoder_Widget::updateGraphic() {
-	//get updated values, clear image and redraw
-	//ui.graphicsView->scene()->clear();
 	int batteryDist = ui.batteryDist_spinBox->text().toInt();
 	if (ui.battX_spinBox->text().toInt() < 0.5 * batteryDist) {
 		ui.battX_spinBox->setValue(0.5 * batteryDist);
@@ -216,11 +146,18 @@ void GCoder_Widget::updateGraphic() {
 	}
 	QBrush brushy2(Qt::SolidPattern);
 	brushy.setColor(QColor(Qt::blue));
-	int prongEllipseSize = 3;
+	int prongEllipseSize = 2;
+	int startEllipseSize = 4;
+	scene->addEllipse(mm2px(ui.startX_spinBox->value() - startEllipseSize / 2), mm2px(ui.startY_spinBox->value() - startEllipseSize / 2), startEllipseSize, startEllipseSize, QPen(Qt::cyan), brushy2);
 	for (int i = 0; i < linePoints.size()-1; i++)
 	{
+		QPen pen(Qt::blue);
 		//scene->addEllipse(mm2px(points[i].x()), mm2px(points[i].y()), mm2px(batteryDist), mm2px(batteryDist), QPen(Qt::red), brushy);
-		scene->addLine(mm2px(linePoints[i].x()), mm2px(linePoints[i].y()), mm2px(linePoints[i+1].x()), mm2px(linePoints[i+1].y()), QPen(Qt::blue));
+		if (i == 0)
+			pen.setColor(Qt::green);
+		else if(i == linePoints.size() - 2)
+			pen.setColor(Qt::magenta);
+		scene->addLine(mm2px(linePoints[i].x()), mm2px(linePoints[i].y()), mm2px(linePoints[i+1].x()), mm2px(linePoints[i+1].y()), pen);
 		if (i != 0) {
 			scene->addEllipse(mm2px(linePoints[i].x() - distProngs - prongEllipseSize / 2), mm2px(linePoints[i].y() - prongEllipseSize / 2), prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
 			scene->addEllipse(mm2px(linePoints[i].x() + distProngs - prongEllipseSize / 2), mm2px(linePoints[i].y() - prongEllipseSize / 2), prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
@@ -238,6 +175,9 @@ void GCoder_Widget::loadSettings()
 		saveSettings();// save default
 	}
 	else {
+		//while (!QFile(m_sSettingsFile).waitForReadyRead(10));
+		//qfilewatcher->
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		QSettings settings(m_sSettingsFile, QSettings::IniFormat);
 		settings.beginGroup("Parameters");
 		ui.column_spinBox->setValue(settings.value("Columns").toInt());
@@ -255,6 +195,7 @@ void GCoder_Widget::loadSettings()
 		distProngs = settings.value("DistanceProngs", "5").toInt();
 		ui.distPresses_doubleSpinBox->setValue(settings.value("DistancePresses", "5.0").toDouble());
 		settings.endGroup();
+		std::cout << "PrinterX: " << printerX << " PrinterY: " << printerY << std::endl;
 		
 	}
 
@@ -372,6 +313,23 @@ void GCoder_Widget::on_pushButton_pressed() {
 	}
 
 	std::cout << "This:\n" << ss.str() << std::endl;
+
+
+	QString filters("G-Code(*.gcode);;Text files (*.txt);;All files (*.*)");
+	QString defaultFilter("G-Code(*.gcode)");
+	std::string filename = QFileDialog::getSaveFileName(this, "Save GCode File", QDir::currentPath(), filters).toStdString();
+	std::cout << filename << std::endl;
+	QFile tempFile(filename.c_str());
+	if (tempFile.open(QIODevice::ReadWrite))
+	{
+		QTextStream stream(&tempFile);
+		stream << ss.str().c_str();
+	}
+	//tempFile.
+	tempFile.close();
+	//QFileDialog dialog(this, "Save file", QDir::currentPath(), filters);
+	//dialog.selectNameFilter(defaultFilter);
+	//dialog.exec();
 }
 
 void GCoder_Widget::on_clear_pushButton_pressed()
@@ -487,6 +445,10 @@ void GCoder_Widget::generate()
 		input.insert(std::pair<std::string, std::string>("X", ui.startX_spinBox->text().toStdString()));
 		input.insert(std::pair<std::string, std::string>("Y", ui.startY_spinBox->text().toStdString()));
 		addGCommand("G1", input);
+
+
+
+
 	}
 	if (ret == QMessageBox::Cancel)
 	{

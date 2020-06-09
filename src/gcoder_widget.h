@@ -7,6 +7,9 @@
 #include <iostream>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QFileSystemWatcher>
+#include <QTextStream>
+#include <thread>
 #include "gcode.h"
 
 class GCoder_Widget : public QWidget {
@@ -19,7 +22,7 @@ public:
 private: //functions
 	Ui::GCoder ui;
 
-	void loadSettings();
+	//void loadSettings();
 
 	void saveSettings();
 
@@ -46,6 +49,7 @@ private slots:
 	void yourfunction(QString v);
 	void updateGraphic();
 	void generate();
+	void loadSettings();
 
 private: //variables
 	QString m_sSettingsFile;
@@ -55,6 +59,7 @@ private: //variables
 	GCode gcode;
 
 	QGraphicsScene* scene;
+	QFileSystemWatcher* qfilewatcher;
 
 	int printerX = 100, printerY = 100;
 	int distProngs = 5;

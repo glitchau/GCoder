@@ -348,6 +348,9 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="value">
+    <number>10</number>
+   </property>
   </widget>
   <widget class="QSpinBox" name="startY_spinBox">
    <property name="geometry">
@@ -358,6 +361,9 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="value">
+    <number>10</number>
+   </property>
   </widget>
   <widget class="QSpinBox" name="travelZ_spinBox">
    <property name="geometry">
@@ -367,6 +373,9 @@
      <width>42</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="value">
+    <number>70</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="pressZ_spinBox">
@@ -381,6 +390,9 @@
    <property name="maximum">
     <number>200</number>
    </property>
+   <property name="value">
+    <number>63</number>
+   </property>
   </widget>
   <widget class="QSpinBox" name="presses_spinBox">
    <property name="geometry">
@@ -390,6 +402,9 @@
      <width>42</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
    </property>
    <property name="maximum">
     <number>5</number>
@@ -439,6 +454,12 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="minimum">
+    <number>5</number>
+   </property>
+   <property name="value">
+    <number>20</number>
+   </property>
   </widget>
   <widget class="QSpinBox" name="battY_spinBox">
    <property name="geometry">
@@ -449,8 +470,37 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="minimum">
+    <number>5</number>
+   </property>
+   <property name="value">
+    <number>20</number>
+   </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>column_spinBox</tabstop>
+  <tabstop>row_spinBox</tabstop>
+  <tabstop>batteryDist_spinBox</tabstop>
+  <tabstop>startX_spinBox</tabstop>
+  <tabstop>startY_spinBox</tabstop>
+  <tabstop>battX_spinBox</tabstop>
+  <tabstop>battY_spinBox</tabstop>
+  <tabstop>travelZ_spinBox</tabstop>
+  <tabstop>pressZ_spinBox</tabstop>
+  <tabstop>presses_spinBox</tabstop>
+  <tabstop>distPresses_doubleSpinBox</tabstop>
+  <tabstop>generate_pushButton</tabstop>
+  <tabstop>printer_pushButton</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>up_pushButton</tabstop>
+  <tabstop>down_pushButton</tabstop>
+  <tabstop>add_pushButton</tabstop>
+  <tabstop>remove_pushButton</tabstop>
+  <tabstop>clear_pushButton</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>graphicsView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

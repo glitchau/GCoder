@@ -37,7 +37,7 @@ set(MY_SOURCES
 	src/gcoder_widget.cpp
 	src/gcode.cpp
 	include/gcode.h
-	include/comboboxitem.h
+	#include/comboboxitem.h
 )
 
 set(MY_MOCS
