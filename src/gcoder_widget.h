@@ -10,6 +10,8 @@
 #include <QFileSystemWatcher>
 #include <QTextStream>
 #include <thread>
+#include <chrono>
+#include <iomanip>
 #include "gcode.h"
 
 class GCoder_Widget : public QWidget {
@@ -50,8 +52,9 @@ private slots:
 	void updateGraphic();
 	void generate();
 	void loadSettings();
-	void UpdateTreeWidget(QTreeWidgetItem*, int);
-
+	void updateTreeWidget();
+	void updateTreeWidget(QTreeWidgetItem*, int);
+	
 private: //variables
 	QString m_sSettingsFile;
 
@@ -64,5 +67,7 @@ private: //variables
 
 	int printerX = 100, printerY = 100;
 	int distProngs = 5;
+
+	std::atomic<bool> buildingGCode;
 };
 #endif

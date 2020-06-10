@@ -7,7 +7,7 @@
 GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 {
 	ui.setupUi(this);
-	
+	buildingGCode = false;
 	scene = new QGraphicsScene();
 	ui.graphicsView->setScene(scene);
 	ui.treeWidget->setColumnCount(2);
@@ -45,8 +45,8 @@ GCoder_Widget::GCoder_Widget(QWidget* parent) : QWidget(parent)
 	//connect(ui.distPresses_spinBox, SIGNAL(valueChanged(int)), this, SLOT(updateGraphic()));
 	connect(ui.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(updateGraphic()));
 	connect(ui.generate_pushButton, SIGNAL(pressed()), this, SLOT(generate()));
-	connect(ui.treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(UpdateTreeWidget(QTreeWidgetItem*, int)));
-
+	//connect(ui.treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(updateTreeWidget(QTreeWidgetItem*, int)));
+	connect(ui.update_pushButton, SIGNAL(pressed()), this, SLOT(updateTreeWidget()));
 	connect(qfilewatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(loadSettings()));
 }
 
@@ -72,6 +72,7 @@ void GCoder_Widget::on_remove_pushButton_pressed()
 }
 
 void GCoder_Widget::updateGraphic() {
+	std::cout << "Updating Graphics" << std::endl;
 	int batteryDist = ui.batteryDist_spinBox->text().toInt();
 	if (ui.battX_spinBox->text().toInt() < 0.5 * batteryDist) {
 		ui.battX_spinBox->setValue(0.5 * batteryDist);
@@ -109,64 +110,63 @@ void GCoder_Widget::updateGraphic() {
 
 
 	//add lines
-	QVector<QPointF> linePoints;
-	for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
-	{
-		QComboBox* box = qobject_cast<QComboBox*>(ui.treeWidget->itemWidget(ui.treeWidget->topLevelItem(i), 0));//get combobox
-		std::string currentG = box->currentText().toStdString();//get G#
-		//std::cout << "curG: " << currentG << std::endl;
-		if (!currentG.compare("G1"))
-		{
-			//double linex, liney;
-			QPointF point;
-			bool Xtrue = false, YTrue = false;
-			for (int j = 0; j < ui.treeWidget->topLevelItem(i)->childCount(); ++j)
-			{
-				if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
-					std::string variable = ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString();
-					if (!variable.compare("X"))
-					{
 
-						//linex = ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble();
-						point.setX(ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble());
-						Xtrue = true;
-						//std::cout << "x: " << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble() << std::endl;
-					}
-					if (!variable.compare("Y"))
-					{
-						point.setY(ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble());
-						YTrue = true;
-						//std::cout << "y: " << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble() << std::endl;
+		QVector<QPointF> linePoints;
+		for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
+		{
+			QComboBox* box = qobject_cast<QComboBox*>(ui.treeWidget->itemWidget(ui.treeWidget->topLevelItem(i), 0));//get combobox
+			std::string currentG = box->currentText().toStdString();//get G#
+			//std::cout << "curG: " << currentG << std::endl;
+			if (!currentG.compare("G1"))
+			{
+				//double linex, liney;
+				QPointF point;
+				bool Xtrue = false, YTrue = false;
+				for (int j = 0; j < ui.treeWidget->topLevelItem(i)->childCount(); ++j)
+				{
+					if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
+						std::string variable = ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString();
+						if (!variable.compare("X"))
+						{
+
+							//linex = ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble();
+							point.setX(ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble());
+							Xtrue = true;
+							//std::cout << "x: " << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble() << std::endl;
+						}
+						if (!variable.compare("Y"))
+						{
+							point.setY(ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble());
+							YTrue = true;
+							//std::cout << "y: " << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toDouble() << std::endl;
+						}
 					}
 				}
-			}
-			if (Xtrue && YTrue)
-			{
-				linePoints.append(point);
+				if (Xtrue && YTrue)
+				{
+					linePoints.append(point);
+				}
 			}
 		}
-	}
-	QBrush brushy2(Qt::SolidPattern);
-	brushy.setColor(QColor(Qt::blue));
-	int prongEllipseSize = 3;
-	int startEllipseSize = 4;
-	scene->addEllipse(mm2px(ui.startX_spinBox->value())- startEllipseSize/2, mm2px(ui.startY_spinBox->value())- startEllipseSize/2, startEllipseSize, startEllipseSize, QPen(Qt::cyan), brushy2);
-	for (int i = 0; i < linePoints.size()-1; i++)
-	{
-		QPen pen(Qt::blue);
-		//scene->addEllipse(mm2px(points[i].x()), mm2px(points[i].y()), mm2px(batteryDist), mm2px(batteryDist), QPen(Qt::red), brushy);
-		if (i == 0)
-			pen.setColor(Qt::green);
-		else if(i == linePoints.size() - 2)
-			pen.setColor(Qt::magenta);
-		scene->addLine(mm2px(linePoints[i].x()), mm2px(linePoints[i].y()), mm2px(linePoints[i+1].x()), mm2px(linePoints[i+1].y()), pen);
-		if (i != 0) {
-			scene->addEllipse(mm2px(linePoints[i].x() - distProngs) - prongEllipseSize / 2, mm2px(linePoints[i].y()) - prongEllipseSize / 2, prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
-			scene->addEllipse(mm2px(linePoints[i].x() + distProngs) - prongEllipseSize / 2, mm2px(linePoints[i].y()) - prongEllipseSize / 2, prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+		QBrush brushy2(Qt::SolidPattern);
+		brushy.setColor(QColor(Qt::blue));
+		int prongEllipseSize = 3;
+		int startEllipseSize = 4;
+		scene->addEllipse(mm2px(ui.startX_spinBox->value()) - startEllipseSize / 2, mm2px(ui.startY_spinBox->value()) - startEllipseSize / 2, startEllipseSize, startEllipseSize, QPen(Qt::cyan), brushy2);
+		for (int i = 0; i < linePoints.size() - 1; i++)
+		{
+			QPen pen(Qt::blue);
+			//scene->addEllipse(mm2px(points[i].x()), mm2px(points[i].y()), mm2px(batteryDist), mm2px(batteryDist), QPen(Qt::red), brushy);
+			if (i == 0)
+				pen.setColor(Qt::green);
+			else if (i == linePoints.size() - 2)
+				pen.setColor(Qt::magenta);
+			scene->addLine(mm2px(linePoints[i].x()), mm2px(linePoints[i].y()), mm2px(linePoints[i + 1].x()), mm2px(linePoints[i + 1].y()), pen);
+			if (i != 0) {
+				scene->addEllipse(mm2px(linePoints[i].x() - distProngs) - prongEllipseSize / 2, mm2px(linePoints[i].y()) - prongEllipseSize / 2, prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+				scene->addEllipse(mm2px(linePoints[i].x() + distProngs) - prongEllipseSize / 2, mm2px(linePoints[i].y()) - prongEllipseSize / 2, prongEllipseSize, prongEllipseSize, QPen(Qt::blue), brushy2);
+			}
 		}
-	}
-
-
 }
 
 void GCoder_Widget::loadSettings()
@@ -196,6 +196,7 @@ void GCoder_Widget::loadSettings()
 		printerY = settings.value("PrinterY", "100").toInt();
 		distProngs = settings.value("DistanceProngs", "5").toInt();
 		ui.distPresses_doubleSpinBox->setValue(settings.value("DistancePresses", "5.0").toDouble());
+		ui.wait_spinBox->setValue(settings.value("WaitTime").toInt());
 		settings.endGroup();
 		std::cout << "PrinterX: " << printerX << " PrinterY: " << printerY << std::endl;
 		
@@ -225,6 +226,7 @@ void GCoder_Widget::saveSettings()
 	settings.setValue("PrinterY", printerY);
 	settings.setValue("DistanceProngs", distProngs);
 	settings.setValue("DistancePresses", ui.distPresses_doubleSpinBox->text());
+	settings.setValue("WaitTime", ui.wait_spinBox->text());
 	//distPresses_doubleSpinBox
 	settings.endGroup();
 }
@@ -391,6 +393,9 @@ void GCoder_Widget::generate()
 	//iterate through all presses -> travel height, move, press, travel height, etc.
 
 		std::map<std::string, std::string> input;
+		input.insert(std::pair<std::string, std::string>("F", "1800"));
+		addGCommand("G1", input);
+		input.clear();
 		input.insert(std::pair<std::string, std::string>("Z", ui.travelZ_spinBox->text().toStdString()));
 		addGCommand("G1", input);
 		input.clear();
@@ -428,10 +433,19 @@ void GCoder_Widget::generate()
 			}
 			x = x + batteryDist;
 		}
-
+		
+		
+		//fsec fs = t1 - t0;
+		//ms d = std::chrono::duration_cast<ms>(fs);
+		//std::cout << fs.count() << "s\n";
+		//std::cout << d.count() << "ms\n";
+		//disconnect(ui.treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(UpdateTreeWidget(QTreeWidgetItem*, int)));
+		std::chrono::milliseconds totalTime = std::chrono::milliseconds();
 		for (int i = 0; i < points.size(); i++)//press points
 		{
-			std::cout << "x: " << points[i].x() << " y: " << points[i].y() << std::endl;
+			auto start = std::chrono::high_resolution_clock::now();
+			double completedPercent = ((double)i / ((double)points.size() - 1.0)) * 100.0;
+			std::cout << std::setprecision(1) <<  "x: " << points[i].x() << " y: " << points[i].y() << " [" << i << "/" << points.size()-1 << "] " << std::fixed << completedPercent << "%" << std::endl;
 			input.clear();
 			input.insert(std::pair<std::string, std::string>("X", QString::number(points[i].x()).toStdString()));
 			input.insert(std::pair<std::string, std::string>("Y", QString::number(points[i].y()).toStdString()));
@@ -440,26 +454,35 @@ void GCoder_Widget::generate()
 			input.insert(std::pair<std::string, std::string>("Z", ui.pressZ_spinBox->text().toStdString()));
 			addGCommand("G1", input);
 			input.clear();
+			input.insert(std::pair<std::string, std::string>("P", ui.wait_spinBox->text().toStdString()));
+			addGCommand("G4", input);
+			input.clear();
 			input.insert(std::pair<std::string, std::string>("Z", ui.travelZ_spinBox->text().toStdString()));
 			addGCommand("G1", input);
+			auto end = std::chrono::high_resolution_clock::now();
+			auto timeTaken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			//std::chrono::duration<double> diff = end - start;
+			totalTime = totalTime + timeTaken;
+			std::cout << "Time Taken Per: " << std::setprecision(4) << timeTaken.count() << " ms" << std::endl;
 		}
+		std::cout << "Total Time Taken: " << (double)totalTime.count() / 1000 << " seconds" << std::endl;// << or" << totalTime.count() << " ms" << std::endl;
 		input.clear();
 		input.insert(std::pair<std::string, std::string>("X", ui.startX_spinBox->text().toStdString()));
 		input.insert(std::pair<std::string, std::string>("Y", ui.startY_spinBox->text().toStdString()));
 		addGCommand("G1", input);
-
-
-
-
+		//connect(ui.treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(UpdateTreeWidget(QTreeWidgetItem*, int)));
 	}
+	//
 	if (ret == QMessageBox::Cancel)
 	{
 		std::cout << "Action Cancelled" << std::endl;
 	}
 	updateGraphic();
+	updateTreeWidget();
 }
 
-void GCoder_Widget::UpdateTreeWidget(QTreeWidgetItem* item, int column)
+
+void GCoder_Widget::updateTreeWidget()
 {
 	std::stringstream ss;
 	for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
@@ -470,8 +493,48 @@ void GCoder_Widget::UpdateTreeWidget(QTreeWidgetItem* item, int column)
 			if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
 				ss << ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString() << ":" << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString() << "   ";
 			}
-			
+
 		}
 		ui.treeWidget->topLevelItem(i)->setText(1, ss.str().c_str());
-	}	
+	}
+}
+
+
+void GCoder_Widget::updateTreeWidget(QTreeWidgetItem* item, int column)
+{
+	
+	//std::stringstream ss;
+	/*
+	for (int i = 0; i < ui.treeWidget->topLevelItemCount(); ++i)
+	{
+		ss.str(std::string());
+		for (int j = 0; j < ui.treeWidget->topLevelItem(i)->childCount(); ++j)
+		{
+			if (!ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString().empty()) {
+				ss << ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString() << ":" << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString() << "   ";
+			}
+
+		}
+		ui.treeWidget->topLevelItem(i)->setText(1, ss.str().c_str());
+	}
+	*/
+	/*
+	if (item->parent()) {
+		std::cout << "Parent" << std::endl;
+		std::cout << item->parent()->childCount() << std::endl;
+	}*/
+	/*
+	if (item->childCount() > 0)
+	{
+		for (int j = 0; j < item->childCount(); ++j)
+		{
+			item->child(j)->text(1).toStdString().empty();
+			if (!item->child(j)->text(1).toStdString().empty()) {
+				//ss << ui.treeWidget->topLevelItem(i)->child(j)->text(0).toStdString() << ":" << ui.treeWidget->topLevelItem(i)->child(j)->text(1).toStdString() << "   ";
+				ss << item->child(j)->text(0).toStdString() << ":" << item->child(j)->text(1).toStdString() << "   ";
+			}
+		}
+		item->setText(1, ss.str().c_str());
+	}
+	*/
 }

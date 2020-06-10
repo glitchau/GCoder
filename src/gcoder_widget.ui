@@ -268,7 +268,7 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>320</y>
+     <y>340</y>
      <width>101</width>
      <height>28</height>
     </rect>
@@ -478,6 +478,51 @@
    </property>
    <property name="value">
     <number>20</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>310</y>
+     <width>161</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Press Wait Time (ms)</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="wait_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>310</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>999</number>
+   </property>
+   <property name="value">
+    <number>500</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="update_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>650</y>
+     <width>101</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Update</string>
    </property>
   </widget>
  </widget>
